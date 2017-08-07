@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!-- 注解装配 -->
+<!--     <context:annotation-config /> -->
+    <!-- 自动检测注解 -->
+    <context:component-scan base-package="com.wangxinxin.entity">
+    	<context:include-filter type="assignable" expression="com.wangxinxin.entity.Jugger"/>
+    	<context:exclude-filter type="annotation" expression="com.wangxinxin.util.StringedInstrument2"/>
+    </context:component-scan>
+	<!-- prototype每次调用都新建实例，singleton默认单例 -->
+	<bean id="sonnet29" class="com.wangxinxin.entity.Sonnet29" scope="prototype"></bean>
+	<bean class="com.wangxinxin.entity.NorthMan" id="northMan">
+		<property name="a" value="testA"></property>
+	</bean>
+	<!-- 切换为p标签 -->
+	<bean id="northMan2" class="com.wangxinxin.entity.NorthMan" 
+	p:a="testA" p:sonnet29-ref="sonnet29" />
+	
+	<bean class="com.wangxinxin.entity.SouthMan" id="southMan"></bean>
+	<!-- 声明bean -->
+	<bean id="poeticJugger" class="com.wangxinxin.entity.PoeticJugger">
+		<constructor-arg value="15" />
+		<constructor-arg ref="sonnet29" />
+	</bean>
+
+	<!-- spring的bean默认都是单例bean -->
+	<bean id="theStage" class="com.wangxinxin.util.Stage"
+		factory-method="getInstance" />
+
+	<!-- 装配List、Set和Array Map -->
+	<bean id="colloection1" class="com.wangxinxin.entity.Colloection1">
+		<property name="northMans">
+			<list>
+				<ref bean="northMan"/>
+				<ref bean="northMan2"/>
+			</list>
+		</property>
+		<property name="set1">
+			<set>
+				<ref bean="northMan"/>
+				<ref bean="northMan2"/>
+			</set>
+		</property>
+		<property name="map1">
+			<map>
+				<entry key="no1" value-ref="northMan"/>
+				<entry key="no2" value-ref="northMan2"/>
+			</map>
+		</property>
+		<!-- map的key和value都是string时优先使用properties -->
+		<property name="map2">
+			<props>
+				<prop key="no1">111111111</prop>
+				<prop key="no2">222222222</prop>
+			</props>
+		</property>
+	</bean>
+	<!-- 声明事务 -->
+	<aop:config>
+		<aop:aspect ref="andience">
+			<aop:before method="takeSeats" pointcut="execution(* com.wangxinxin.entity.Jugger.perform(..))"/>
+			<aop:after-returning method="turnOffCellPhones" pointcut="execution(* com.wangxinxin.entity.Jugger.perform(..))"/>
+			<aop:after-throwing-returning method="demandRefund" pointcut="execution(* com.wangxinxin.entity.Jugger.perform(..))"/>
+		</aop:aspect>
+	</aop:config>
+	
+</beans>
